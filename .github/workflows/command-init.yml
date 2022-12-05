@@ -1,0 +1,38 @@
+name: 命令：初始化环境
+
+# 当收到 repository_dispatch 事件 init 时：
+# 1. 从 init 事件获取要初始化的环境
+# 据此配置 cmdb 参数，执行 create 动作
+
+on:
+  repository_dispatch:
+    types: [ init-command ]
+
+jobs:
+  deploy:
+    runs-on: [ self-hosted, linux, x64 ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: 初始化环境
+        env:
+          CMDB_CONFIG: .cmdb.yaml
+          CMDB_PROFILE: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
+          CMDB_GIT_SHA: ${{ github.sha }}
+          CMDB_GIT_REF: ${{ github.ref }}
+        run: cmdb create
+
+      - id: vars
+        run: echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+
+      - uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            
+            环境：${{ github.event.client_payload.args.env }} 已成功初始化
+            
+            [点击这里查看命令运行日志][1]
+            
+            [1]: ${{ steps.vars.outputs.run-url }}

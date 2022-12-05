@@ -1,0 +1,23 @@
+name: 生产环境
+
+# 当在 github 页面创建 release 时：
+# 1. 使用 release 对应的 tag 指向的 COMMIT SHA
+# 2. 从 SHA 处检出代码：只使用 .cmdb.yaml
+# 据此配置 cmdb 参数，执行 upgrade 动作
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  deploy:
+    runs-on: [ self-hosted, linux, x64 ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: 发布到生产环境
+        env:
+          CMDB_PROFILE: production
+          REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+        run: cmdb upgrade

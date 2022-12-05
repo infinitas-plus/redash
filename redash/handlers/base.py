@@ -121,6 +121,15 @@ def filter_by_tags(result_set, column):
         )
     return result_set
 
+def filter_by_group_ids_as_tags(result_set, column, group_ids):
+    if group_ids.contains("default") or group_ids.contains("admin"):
+        return result_set
+
+    result_set = result_set.filter(
+        cast(column, postgresql.ARRAY(db.Text)).contains(group_ids)
+    )
+
+    return result_set
 
 def order_results(results, default_order, allowed_orders, fallback=True):
     """

@@ -1,0 +1,37 @@
+name: 命令：发 UAT 环境
+
+# 当收到 repository_dispatch 事件 test 时：
+# 1. 从 test 事件获取要部署的 COMMIT SHA
+# 2. 从 SHA 处检出代码：只使用 .cmdb.yaml
+# 据此配置 cmdb 参数，执行 upgrade 动作
+
+on:
+  repository_dispatch:
+    types: [ uat-command ]
+
+jobs:
+  deploy:
+    runs-on: [ self-hosted, linux, x64 ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: 发布到 UAT 环境
+        env:
+          CMDB_PROFILE: uat
+          REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+        run: cmdb upgrade
+
+      - id: vars
+        run: echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+
+      - uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            
+            已成功发布到 UAT 环境
+            
+            [点击这里查看命令运行日志][1]
+            
+            [1]: ${{ steps.vars.outputs.run-url }}

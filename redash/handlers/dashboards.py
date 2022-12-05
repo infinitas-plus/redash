@@ -65,6 +65,8 @@ class DashboardListResource(BaseResource):
                 self.current_org, self.current_user.group_ids, self.current_user.id
             )
 
+        results = filter_by_group_ids_as_tags(results, models.Dashboard.tags, self.current_user.group_ids)
+        
         results = filter_by_tags(results, models.Dashboard.tags)
 
         # order results according to passed order parameter,

@@ -1,0 +1,37 @@
+name: 控制台
+
+on:
+  issue_comment:
+    types: [ created ]
+
+jobs:
+  slashCommandDispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slash Command Dispatch
+        uses: peter-evans/slash-command-dispatch@v2
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          config: >
+            [
+              {
+                "command": "test",
+                "documents": "test SHA"
+              },
+              {
+                "command": "uat",
+                "documents": "uat SHA"
+              },
+              {
+                "command": "release",
+                "documents": "release SHA"
+              },
+              {
+                "command": "init",
+                "documents": "init ENV",
+                "permission": "admin"
+              },
+              {
+                "command": "help"
+              }
+            ]
