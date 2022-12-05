@@ -6,7 +6,9 @@ name: 开发环境
 # 据此配置 cmdb 参数，执行 build/upgrade 动作
 
 on:
-  push
+  push:
+    tags:
+      - t*
 
 concurrency:
   group: ${{ github.workflow }}
