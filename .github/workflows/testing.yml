@@ -1,26 +1,30 @@
 name: 测试环境
 
-# 当 tags 上传后：
+# 当 v* tag ( v 开头的 tag，如 v0.1.0 ) 上传后：
 # 1. 使用 tag 指向的 COMMIT SHA
 # 2. 从 SHA 处检出代码
-# 据此配置 cmdb 参数，执行 build/upgrade 动作
+# 据此配置 cmdb 参数，执行构建动作
 
 on:
   push:
     tags:
       - v*
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
-  build:
-      runs-on: [self-hosted, test]
+  cmdb-integration:
+    runs-on: [self-hosted, test]
 
     steps:
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: 质量门禁
-        run: echo TODO
+    - name: 质量门禁
+      run: echo TODO
 
-      - name: 构建镜像，并发布到测试环境
-        env:
-          CMDB_PROFILE: testing
-          REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
-        run: cmdb upgrade
+    - name: 构建镜像，并发布到测试环境
+      env:
+        CMDB_PROFILE: testing
+      run: cmdb upgrade
