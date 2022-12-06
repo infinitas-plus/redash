@@ -8,6 +8,7 @@ from flask_restful import Resource, abort
 from redash import settings
 from redash.authentication import current_org
 from redash.models import db
+from redash.models.users import Group
 from redash.tasks import record_event as record_event_task
 from redash.utils import json_dumps
 from sqlalchemy.orm.exc import NoResultFound
@@ -122,11 +123,13 @@ def filter_by_tags(result_set, column):
     return result_set
 
 def filter_by_group_ids_as_tags(result_set, column, group_ids):
-    if "default" in group_ids or "admin" in group_ids:
+    groups = Group.query.filter(Group.id.in_(group_ids)).all()
+    group_names = [group.name for group in groups]
+    if "default" in group_names or "admin" in group_names:
         return result_set
 
     result_set = result_set.filter(
-        cast(column, postgresql.ARRAY(db.Text)).contains(group_ids)
+        cast(column, postgresql.ARRAY(db.Text)).contains(group_names)
     )
 
     return result_set
