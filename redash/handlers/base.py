@@ -122,7 +122,7 @@ def filter_by_tags(result_set, column):
     return result_set
 
 def filter_by_group_ids_as_tags(result_set, column, group_ids):
-    if group_ids.contains("default") or group_ids.contains("admin"):
+    if "default" in group_ids or "admin" in group_ids:
         return result_set
 
     result_set = result_set.filter(
