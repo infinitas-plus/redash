@@ -8,6 +8,7 @@ from redash.handlers.base import (
     get_object_or_404,
     paginate,
     filter_by_tags,
+    filter_by_group_ids_as_tags,
     order_results as _order_results,
 )
 from redash.permissions import (
