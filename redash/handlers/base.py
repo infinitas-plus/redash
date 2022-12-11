@@ -129,7 +129,7 @@ def filter_by_group_ids_as_tags(result_set, column, group_ids):
         return result_set
 
     result_set = result_set.filter(
-        cast(column, postgresql.ARRAY(db.Text)).contained_by(group_names)
+        cast(column, postgresql.ARRAY(db.Text)).overlap(group_names)
     )
 
     return result_set
